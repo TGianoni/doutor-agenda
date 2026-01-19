@@ -20,7 +20,7 @@ const SignOutButton = () => {
         })
       }
     >
-      LogOut
+      Sair
     </Button>
   );
 };
