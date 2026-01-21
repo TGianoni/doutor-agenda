@@ -52,7 +52,7 @@ export const upsertDoctor = actionClient
             set: {
                 ...parsedInput,
                 availableFromTime: availableFromTimeUTC.format('HH:mm:ss'),
-            availableToTime: availableToTimeUTC.format('HH:mm:ss')
+                availableToTime: availableToTimeUTC.format('HH:mm:ss')
             },
         })
         revalidatePath("/doctors")
