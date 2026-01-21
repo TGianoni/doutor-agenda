@@ -115,10 +115,10 @@ export const doctorsTable = pgTable("doctors", {
   name: text("name").notNull(),
   avatarImageUrl: text("avatar_image_url"),
   // 0 - Sunday, 1 - Monday, 2 - Tuesday, 3 - Wednesday, 4 - Thursday, 5 - Friday, 6 - Saturday
-  avaiableFromWeekday: integer("avaiable_from_weekday").notNull(), // 1
-  avaiableToWeekday: integer("avaiable_to_weekday").notNull(), // 5
-  avaiableFromTime: time("avaiable_from_time").notNull(),
-  avaiableToTime: time("avaiable_to_time").notNull(),
+  availableFromWeekDay: integer("avaiable_from_weekday").notNull(), // 1
+  availableToWeekDay: integer("avaiable_to_weekday").notNull(), // 5
+  availableFromTime: time("avaiable_from_time").notNull(),
+  availableToTime: time("avaiable_to_time").notNull(),
   specialty: text("specialty").notNull(),
   appointmentPriceInCents: integer("appointment_price_in_cents").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
