@@ -1,11 +1,11 @@
 "use client"
 
-import { CalendarIcon, ClockIcon, DollarSignIcon, TrashIcon } from 'lucide-react'
+import { MailIcon, PhoneIcon, TrashIcon, UserIcon } from 'lucide-react'
 import { useAction } from 'next-safe-action/hooks'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
 
-import { deleteDoctor } from '@/actions/delete-doctor'
+import { deletePatient } from '@/actions/delete-patient'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,99 +23,97 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
-import { doctorsTable } from '@/db/schema'
-import { formatCurrencyInCents } from '@/helpers/currency'
+import { patientsTable } from '@/db/schema'
+import { formatPhoneNumber } from '@/helpers/phone'
 
-import { getAvailability } from '../_helpers/availability'
-import UpsertDoctorForm from './upsert-doctor-form'
+import UpsertPatientForm from './upsert-patient-form'
 
-interface DoctorCardProps {
-    doctor: typeof doctorsTable.$inferSelect
+interface PatientCardProps {
+    patient: typeof patientsTable.$inferSelect
 }
 
-const DoctorCard = ({doctor} : DoctorCardProps) => {
-    const [isUpsertDoctorDialogOpen, setIsUpsertDoctorDialogOpen] = useState(false)
-    const deleteDoctorAction = useAction(deleteDoctor, {
+const PatientCard = ({patient} : PatientCardProps) => {
+    const [isUpsertPatientDialogOpen, setIsUpsertPatientDialogOpen] = useState(false)
+    const deletePatientAction = useAction(deletePatient, {
         onSuccess: () => {
-            toast.success("Médico deletado com sucesso.")
+            toast.success("Paciente deletado com sucesso.")
         },
         onError: () => {
-            toast.error("Erro ao deletar médico.")
+            toast.error("Erro ao deletar paciente.")
         }
     })
-    const handleDeleteDoctorClick = () => {
-        if (!doctor) return
-        deleteDoctorAction.execute({id: doctor.id})
+    const handleDeletePatientClick = () => {
+        if (!patient) return
+        deletePatientAction.execute({id: patient.id})
     }
-    const doctorInitials = doctor.name
+    const patientInitials = patient.name
         .split(" ")
         .map((name) => name[0])
         .join("")
-    const availability = getAvailability(doctor)
+        .toUpperCase()
+        .slice(0, 2)
+    
+    const sexLabel = patient.sex === "male" ? "Masculino" : "Feminino"
   return (
     <Card>
         <CardHeader>
             <div className="flex items-center gap-2">
                 <Avatar className='h-10 w-10'>
-                    <AvatarFallback>{doctorInitials}</AvatarFallback>
+                    <AvatarFallback>{patientInitials}</AvatarFallback>
                 </Avatar>
                 <div>
-                    <h3 className='text-sm font-medium'>{doctor.name}</h3>
+                    <h3 className='text-sm font-medium'>{patient.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                        {doctor.specialty}
+                        {patient.email}
                     </p>
                 </div>
             </div>
         </CardHeader>
         <Separator />
-        <CardContent className='flex flex-col gap-2'>
+        <CardContent className='flex flex-col gap-2 pt-4'>
             <Badge variant="outline">
-                <CalendarIcon className='mr-1'/>
-                {availability.from.format("dddd")} a {availability.to.format("dddd")}
+                <MailIcon className='mr-1'/>
+                {patient.email}
             </Badge>
             <Badge variant="outline">
-                <ClockIcon className='mr-1' />
-                {availability.from.format("HH:mm")} -{" "}
-                {availability.to.format("HH:mm")}
+                <PhoneIcon className='mr-1' />
+                {formatPhoneNumber(patient.phoneNumber)}
             </Badge>
             <Badge variant="outline">
-                <DollarSignIcon className='mr-1' />
-                {formatCurrencyInCents(doctor.appointmentPriceInCents)}
+                <UserIcon className='mr-1' />
+                {sexLabel}
             </Badge>
         </CardContent>
         <Separator />
         <CardFooter className='flex flex-col gap-2'>
-            <Dialog open={isUpsertDoctorDialogOpen} onOpenChange={setIsUpsertDoctorDialogOpen}>
+            <Dialog open={isUpsertPatientDialogOpen} onOpenChange={setIsUpsertPatientDialogOpen}>
             <DialogTrigger asChild>
             <Button className='w-full'>Ver detalhes</Button>
             </DialogTrigger>
-            <UpsertDoctorForm doctor={{
-                ...doctor,
-                availableToTime: availability.to.format("HH:mm:ss"),
-                availableFromTime: availability.from.format("HH:mm:ss")
-            }} 
-            onSuccess={() => setIsUpsertDoctorDialogOpen(false)}
-            isOpen={isUpsertDoctorDialogOpen}
+            <UpsertPatientForm 
+                patient={patient} 
+                onSuccess={() => setIsUpsertPatientDialogOpen(false)}
+                isOpen={isUpsertPatientDialogOpen}
             />
             </Dialog>
             <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button variant="outline" className='w-full'>
                 <TrashIcon />
-                Deletar médico
+                Deletar paciente
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                <AlertDialogTitle>Tem certeza que deseja deletar este médico?</AlertDialogTitle>
+                <AlertDialogTitle>Tem certeza que deseja deletar este paciente?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Essa ação não pode ser revertida. Isso irá deletar o Médico
+                    Essa ação não pode ser revertida. Isso irá deletar o Paciente
                     e todas as consultas agendadas.
                 </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteDoctorClick}>Deletar</AlertDialogAction>
+                <AlertDialogAction onClick={handleDeletePatientClick}>Deletar</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
             </AlertDialog>
@@ -124,4 +122,4 @@ const DoctorCard = ({doctor} : DoctorCardProps) => {
   )
 }
 
-export default DoctorCard
+export default PatientCard
