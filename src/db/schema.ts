@@ -75,10 +75,10 @@ export const clinicsTable = pgTable("clinics", {
 
 export const usersToClinicsTable = pgTable("users_to_clinics", {
   userId: text("user_id")
-    .references(() => usersTable.id, {onDelete: "cascade"})
+    .references(() => usersTable.id, { onDelete: "cascade" })
     .notNull(),
   clinicId: uuid("clinic_id")
-    .references(() => clinicsTable.id, {onDelete: "cascade"})
+    .references(() => clinicsTable.id, { onDelete: "cascade" })
     .notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
@@ -168,16 +168,17 @@ export const patientsTableRelations = relations(
 
 export const appointmentsTable = pgTable("appointments", {
   id: uuid("id").defaultRandom().primaryKey(),
-  patientId: uuid("patient_id")
-    .references(() => patientsTable.id, { onDelete: "cascade" })
-    .notNull(),
-  doctorId: uuid("doctor_id")
-    .references(() => doctorsTable.id, { onDelete: "cascade" })
-    .notNull(),
-  clinicId: uuid("clinic_id")
-    .references(() => clinicsTable.id, { onDelete: "cascade" })
-    .notNull(),
   date: timestamp("date").notNull(),
+  appointmentPriceInCents: integer("appointment_price_in_cents").notNull(),
+  clinicId: uuid("clinic_id")
+    .notNull()
+    .references(() => clinicsTable.id, { onDelete: "cascade" }),
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => patientsTable.id, { onDelete: "cascade" }),
+  doctorId: uuid("doctor_id")
+    .notNull()
+    .references(() => doctorsTable.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

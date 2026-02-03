@@ -3,19 +3,22 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
 
+import { DataTable } from "@/components/ui/data-table";
 import {
   PageActions,
   PageContainer,
+  PageContent,
   PageDescription,
   PageHeader,
   PageHeaderContent,
   PageTitle,
 } from "@/components/ui/page-container";
 import { db } from "@/db";
-import { doctorsTable, patientsTable } from "@/db/schema";
+import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 import AddAppointmentButton from "./_components/add-appointment-button";
+import { appointmentsTableColumns } from "./_components/table-columns";
 
 const AppointmentsPage = async () => {
   const session = await auth.api.getSession({
@@ -30,12 +33,16 @@ const AppointmentsPage = async () => {
     redirect("/clinic/form");
   }
 
-  const [patients, doctors] = await Promise.all([
+  const [patients, doctors, appointments] = await Promise.all([
     db.query.patientsTable.findMany({
       where: eq(patientsTable.clinicId, session.user.clinic.id),
     }),
     db.query.doctorsTable.findMany({
       where: eq(doctorsTable.clinicId, session.user.clinic.id),
+    }),
+    db.query.appointmentsTable.findMany({
+      where: eq(appointmentsTable.clinicId, session.user.clinic.id),
+      with: { patient: true, doctor: true },
     }),
   ]);
 
@@ -52,7 +59,12 @@ const AppointmentsPage = async () => {
           <AddAppointmentButton patients={patients} doctors={doctors} />
         </PageActions>
       </PageHeader>
-    
+      <PageContent>
+        <DataTable
+          data={appointments}
+          columns={appointmentsTableColumns}
+        />
+      </PageContent>
     </PageContainer>
   );
 };
