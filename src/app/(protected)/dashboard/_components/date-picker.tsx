@@ -2,7 +2,6 @@
 
 import { addMonths, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import dayjs from "dayjs";
 import { CalendarIcon } from "lucide-react";
 import { parseAsIsoDate, useQueryState } from "nuqs";
 import * as React from "react";
@@ -31,10 +30,14 @@ export function DatePicker({
 
   const handleDateSelect = (dateRange: DateRange | undefined) => {
     if (dateRange?.from) {
-      setFrom(dateRange.from);
+      setFrom(dateRange.from, {
+        shallow: false,
+      });
     }
     if (dateRange?.to) {
-      setTo(dateRange.to);
+      setTo(dateRange.to, {
+        shallow: false,
+      });
     }
   };
 
@@ -59,8 +62,13 @@ export function DatePicker({
             {date?.from ? (
               date.to ? (
                 <>
-                  {dayjs(date.from).format("LLL dd, y")}-{" "}
-                  {dayjs(date.to).format("LLL dd, y")}
+                  {format(date.from, "LLL dd, y", {
+                    locale: ptBR,
+                  })}{" "}
+                  -{" "}
+                  {format(date.to, "LLL dd, y", {
+                    locale: ptBR,
+                  })}
                 </>
               ) : (
                 format(date.from, "LLL dd, y")
