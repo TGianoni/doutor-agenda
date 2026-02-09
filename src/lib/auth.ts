@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import {customSession} from "better-auth/plugins"
+import { customSession } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
@@ -12,35 +12,56 @@ export const auth = betterAuth({
     schema,
   }),
   socialProviders: {
-    google: { 
-      clientId: process.env.GOOGLE_CLIENT_ID as string, 
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
   plugins: [
-    customSession( async ({user, session}) => {
+    customSession(async ({ user, session }) => {
       const clinics = await db.query.usersToClinicsTable.findMany({
         where: eq(schema.usersToClinicsTable.userId, user.id),
         with: {
-          clinic: true
-        }
-      })
+          clinic: true,
+          user: true,
+        },
+      });
       // TO DO Ao adaptar para o usuário ter múltiplas clínicas, deve mudar esse código
-      const clinic= clinics?.[0]
+      const clinic = clinics?.[0];
       return {
         user: {
           ...user,
-          clinic: clinic?.clinicId  ? {
-            id: clinic?.clinicId,
-            name: clinic?.clinic?.name
-          } : undefined,
+          plan: clinic?.user.plan,
+          clinic: clinic?.clinicId
+            ? {
+                id: clinic?.clinicId,
+                name: clinic?.clinic?.name,
+              }
+            : undefined,
         },
         session,
-      }
-    })
+      };
+    }),
   ],
   user: {
     modelName: "usersTable",
+    additionalFields: {
+      stripeCustumerId: {
+        type: "string",
+        fieldName: "stripeCustumerId",
+        require: false,
+      },
+      stripeSubscriptionId: {
+        type: "string",
+        fieldName: "stripeSubscriptionId",
+        require: false,
+      },
+      plan: {
+        type: "string",
+        fieldName: "plan",
+        require: false,
+      },
+    },
   },
   session: {
     modelName: "sessionsTable",
