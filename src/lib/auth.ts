@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import * as schema from "@/db/schema";
+import { usersTable, usersToClinicsTable } from "@/db/schema";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -21,10 +22,10 @@ export const auth = betterAuth({
     customSession(async ({ user, session }) => {
       const [userData, clinics] = await Promise.all([
         db.query.usersTable.findFirst({
-          where: eq(schema.usersTable.id, user.id),
+          where: eq(usersTable.id, user.id),
         }),
         db.query.usersToClinicsTable.findMany({
-          where: eq(schema.usersToClinicsTable.userId, user.id),
+          where: eq(usersToClinicsTable.userId, user.id),
           with: {
             clinic: true,
             user: true,
@@ -51,9 +52,9 @@ export const auth = betterAuth({
   user: {
     modelName: "usersTable",
     additionalFields: {
-      stripeCustumerId: {
+      stripeCustomerId: {
         type: "string",
-        fieldName: "stripeCustumerId",
+        fieldName: "stripeCustomerId",
         require: false,
       },
       stripeSubscriptionId: {

@@ -41,6 +41,9 @@ export const POST = async (request: Request) => {
         throw new Error("Subscription ID not found");
       }
       const userId = subscription_details.metadata.userId;
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
       await db
         .update(usersTable)
         .set({

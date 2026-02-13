@@ -86,8 +86,8 @@ export function SubscriptionPlan({
         </div>
 
         <ul className="flex flex-col gap-3" role="list">
-          {features.map((feature) => (
-            <li key={feature} className="flex items-center gap-2">
+          {features.map((feature, index) => (
+            <li key={index} className="flex items-center gap-2">
               <div className="bg-success/15 flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
                 <CheckCircle
                   className="h-3 w-3 text-green-500"
@@ -101,25 +101,24 @@ export function SubscriptionPlan({
       </CardContent>
 
       <CardFooter>
-        {active ? (
-          <Button variant="outline" className="w-full bg-transparent">
-            Gerenciar Assinatura
-          </Button>
-        ) : (
-          <Button
-            className="bg-success text-success-foreground hover:bg-success/90 w-full"
-            onClick={active ? handleManagePlanClick : handleSubscribeClick}
-            disabled={createStripeCheckoutAction.isExecuting}
-          >
-            {createStripeCheckoutAction.isExecuting ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : active ? (
-              "Gerenciar Assinatura"
-            ) : (
-              "Fazer assinatura"
-            )}
-          </Button>
-        )}
+        <Button
+          className={
+            active
+              ? "border-primary text-primary hover:bg-primary/10 w-full border bg-transparent"
+              : "bg-success text-success-foreground hover:bg-success/90 w-full"
+          }
+          variant={active ? "outline" : "default"}
+          onClick={active ? handleManagePlanClick : handleSubscribeClick}
+          disabled={createStripeCheckoutAction.isExecuting}
+        >
+          {createStripeCheckoutAction.isExecuting ? (
+            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+          ) : active ? (
+            "Gerenciar Assinatura"
+          ) : (
+            "Fazer assinatura"
+          )}
+        </Button>
       </CardFooter>
     </Card>
   );
