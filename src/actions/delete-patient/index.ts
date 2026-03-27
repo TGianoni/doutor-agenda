@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -10,21 +10,31 @@ import { patientsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { actionClient } from "@/lib/next-safe-action";
 
-export const deletePatient = actionClient.schema(z.object({
-    id: z.string().uuid(),
-})).action(async ({ parsedInput }) => {
+export const deletePatient = actionClient
+  .schema(
+    z.object({
+      id: z.string().uuid(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
     const session = await auth.api.getSession({
-        headers: await headers()
-    })
+      headers: await headers(),
+    });
     if (!session?.user) {
-        throw new Error("Unauthorized")
+      throw new Error("Unauthorized");
     }
     const patient = await db.query.patientsTable.findFirst({
-        where: eq(patientsTable.id, parsedInput.id)
-    })
-    if (patient?.clinicId != session.user.clinic?.id) {
-        throw new Error("Paciente não encontrado.")
+      where: eq(patientsTable.id, parsedInput.id),
+    });
+    const user = session?.user;
+
+    if (!user || !("clinic" in user) || !user.clinic?.id) {
+      throw new Error("Clinic not found.");
     }
-    await db.delete(patientsTable).where(eq(patientsTable.id, parsedInput.id))
-    revalidatePath("/patients")
-})
+
+    if (patient?.clinicId !== user.clinic.id) {
+      throw new Error("Paciente não encontrado.");
+    }
+    await db.delete(patientsTable).where(eq(patientsTable.id, parsedInput.id));
+    revalidatePath("/patients");
+  });

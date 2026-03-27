@@ -20,33 +20,40 @@ export const auth = betterAuth({
   },
   plugins: [
     customSession(async ({ user, session }) => {
-      const [userData, clinics] = await Promise.all([
-        db.query.usersTable.findFirst({
-          where: eq(usersTable.id, user.id),
-        }),
-        db.query.usersToClinicsTable.findMany({
-          where: eq(usersToClinicsTable.userId, user.id),
-          with: {
-            clinic: true,
-            user: true,
+      if (!user?.id) {
+        return { user, session };
+      }
+      try {
+        const [userData, clinics] = await Promise.all([
+          db.query.usersTable.findFirst({
+            where: eq(usersTable.id, user.id),
+          }),
+          db.query.usersToClinicsTable.findMany({
+            where: eq(usersToClinicsTable.userId, user.id),
+            with: {
+              clinic: true,
+              user: true,
+            },
+          }),
+        ]);
+        // TO DO Ao adaptar para o usuário ter múltiplas clínicas, deve mudar esse código
+        const clinic = clinics?.[0];
+        return {
+          user: {
+            ...user,
+            plan: userData?.plan,
+            clinic: clinic?.clinicId
+              ? {
+                  id: clinic?.clinicId,
+                  name: clinic?.clinic?.name,
+                }
+              : undefined,
           },
-        }),
-      ]);
-      // TO DO Ao adaptar para o usuário ter múltiplas clínicas, deve mudar esse código
-      const clinic = clinics?.[0];
-      return {
-        user: {
-          ...user,
-          plan: userData?.plan,
-          clinic: clinic?.clinicId
-            ? {
-                id: clinic?.clinicId,
-                name: clinic?.clinic?.name,
-              }
-            : undefined,
-        },
-        session,
-      };
+          session,
+        };
+      } catch {
+        return { user, session };
+      }
     }),
   ],
   user: {

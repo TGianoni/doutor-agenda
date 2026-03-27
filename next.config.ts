@@ -1,11 +1,9 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    // Isso impede que o Next crie múltiplos processos que se perdem no Windows
+    workerThreads: false,
+    cpus: 1,
   },
 };
 

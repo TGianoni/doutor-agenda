@@ -29,23 +29,31 @@ const AppointmentsPage = async () => {
     redirect("/authentication");
   }
 
-  if (!session.user.clinic) {
+  const user = session?.user;
+
+  if (!user || !("clinic" in user) || !user.clinic) {
     redirect("/clinic/form");
   }
 
-  if (!session.user.plan) {
+  if (!user || !("plan" in user) || !user.plan) {
     redirect("/new-subscription");
   }
 
+  if (!user || !("clinic" in user) || !user.clinic?.id) {
+    throw new Error("Clinic not found");
+  }
+
+  const clinicId = user.clinic.id;
+
   const [patients, doctors, appointments] = await Promise.all([
     db.query.patientsTable.findMany({
-      where: eq(patientsTable.clinicId, session.user.clinic.id),
+      where: eq(patientsTable.clinicId, clinicId),
     }),
     db.query.doctorsTable.findMany({
-      where: eq(doctorsTable.clinicId, session.user.clinic.id),
+      where: eq(doctorsTable.clinicId, clinicId),
     }),
     db.query.appointmentsTable.findMany({
-      where: eq(appointmentsTable.clinicId, session.user.clinic.id),
+      where: eq(appointmentsTable.clinicId, clinicId),
       with: { patient: true, doctor: true },
     }),
   ]);

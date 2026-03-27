@@ -30,7 +30,9 @@ export const getAvailableTimes = actionClient
     if (!session) {
       throw new Error("Unauthorized");
     }
-    if (!session.user.clinic) {
+    const user = session?.user;
+
+    if (!user || !("clinic" in user) || !user.clinic) {
       throw new Error("Clínica não encontrada");
     }
     const doctor = await db.query.doctorsTable.findFirst({

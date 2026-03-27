@@ -14,8 +14,13 @@ const NewSubscriptionPage = async () => {
     redirect("/login");
   }
 
+  const user = session.user;
+
+  const hasPlan = "plan" in user && !!user.plan;
+  const hasClinic = "clinic" in user && !!user.clinic;
+
   // Se o usuário já concluiu a assinatura, redireciona para o formulário da clínica
-  if (session.user.plan && !session.user.clinic) {
+  if (hasPlan && !hasClinic) {
     redirect("/clinic-form");
   }
 
@@ -45,8 +50,8 @@ const NewSubscriptionPage = async () => {
 
       <div className="w-full max-w-md">
         <SubscriptionPlan
-          userEmail={session.user.email}
-          active={session.user.plan === "essential"}
+          userEmail={user.email}
+          active={hasPlan && user.plan === "essential"}
         />
       </div>
 

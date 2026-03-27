@@ -21,7 +21,7 @@ export const addAppointment = actionClient
     if (!session?.user) {
       throw new Error("Unauthorized");
     }
-    if (!session?.user.clinic?.id) {
+    if (!("clinic" in session.user) || !session.user.clinic?.id) {
       throw new Error("Clinic not found");
     }
     const availableTimes = await getAvailableTimes({

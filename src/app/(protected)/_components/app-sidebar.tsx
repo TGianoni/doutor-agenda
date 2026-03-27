@@ -71,6 +71,10 @@ export function AppSidebar() {
       },
     });
   };
+
+  const user = session.data?.user;
+
+  const clinicName = user && "clinic" in user ? user.clinic?.name : undefined;
   return (
     <Sidebar>
       <SidebarHeader className="border-b p-4">
@@ -123,9 +127,7 @@ export function AppSidebar() {
                     <AvatarFallback>F</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm">
-                      {session.data?.user?.clinic?.name}
-                    </p>
+                    <p className="text-sm">{clinicName}</p>
                     <p className="text-muted-foreground text-sm">
                       {session.data?.user.email}
                     </p>

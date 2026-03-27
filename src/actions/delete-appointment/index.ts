@@ -25,7 +25,13 @@ export const deleteAppointment = actionClient
       where: eq(appointmentsTable.id, parsedInput.id),
     });
 
-    if (appointment?.clinicId !== session.user.clinic?.id) {
+    const user = session?.user;
+
+    if (!user || !("clinic" in user) || !user.clinic?.id) {
+      throw new Error("Clinic not found");
+    }
+
+    if (appointment?.clinicId !== user.clinic.id) {
       throw new Error("Agendamento não encontrado.");
     }
 

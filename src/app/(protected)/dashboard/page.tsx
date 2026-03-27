@@ -39,18 +39,25 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
   if (!session?.user) {
     redirect("authentication");
   }
-  if (!session.user.clinic) {
-    redirect("/clinic-form");
+  const user = session.user;
+
+  if (!("clinic" in user) || !user.clinic?.id) {
+    redirect("/clinic/form");
   }
-  if (!session.user.plan) {
+
+  if (!("plan" in user) || !user.plan) {
     redirect("/new-subscription");
   }
+
   const { from, to } = await searchParams;
   if (!from || !to) {
     redirect(
       `/dashboard?from=${dayjs().format("YYYY-MM-DD")}&to=${dayjs().add(1, "month").format("YYYY-MM-DD")}`,
     );
   }
+
+  const clinicId = user.clinic.id;
+
   const {
     totalRevenue,
     totalAppointments,
@@ -66,7 +73,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     session: {
       user: {
         clinic: {
-          id: session.user.clinic.id,
+          id: clinicId,
         },
       },
     },

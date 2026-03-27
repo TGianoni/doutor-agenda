@@ -21,9 +21,16 @@ const SubscriptionPage = async () => {
   if (!session) {
     redirect("/login");
   }
-  if (!session.user.clinic) {
-    redirect("/clinic-form");
+  const user = session.user;
+
+  if (!("clinic" in user) || !user.clinic?.id) {
+    redirect("/clinic/form");
   }
+
+  if (!("plan" in user) || !user.plan) {
+    redirect("/new-subscription");
+  }
+
   return (
     <PageContainer>
       <PageHeader>
@@ -34,7 +41,7 @@ const SubscriptionPage = async () => {
       </PageHeader>
       <PageContent>
         <SubscriptionPlan
-          active={session.user.plan === "essential"}
+          active={user.plan === "essential"}
           userEmail={session.user.email}
         />
       </PageContent>
