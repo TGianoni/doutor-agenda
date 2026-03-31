@@ -103,10 +103,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === "subscription"}
-                >
+                <SidebarMenuButton asChild isActive={pathname === "subscription"}>
                   <Link href="/subscription">
                     <Gem />
                     <span>Assinatura</span>

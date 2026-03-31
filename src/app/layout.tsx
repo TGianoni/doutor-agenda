@@ -18,9 +18,6 @@ export const metadata: Metadata = {
   description: "Sistema de agendamento",
 };
 
-// Força a renderização dinâmica para evitar erro de Router no build
-export const dynamic = "force-dynamic";
-
 export default function RootLayout({
   children,
 }: Readonly<{
